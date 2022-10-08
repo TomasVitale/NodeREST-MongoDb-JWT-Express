@@ -1,20 +1,38 @@
 import mongoose from "mongoose";
-const {Schema, model} = mongoose;
+import bcrypt from "bcryptjs";
 
-const userSchema = new Schema({
-    email:{
+
+
+const userSchema = new  mongoose.Schema({
+    email: {
         type: String,
         required: true,
         trim: true,
         unique: true,
-        index:{unique: true}
+        lowercase: true,
+        index: { unique: true },
     },
-    password:{
+    password: {
         type: String,
-        required: true
+        required: true,
+    },
+});
+
+userSchema.pre("save", async function(next) {
+    const user = this;
+
+    if (!user.isModified("password")) return next();
+
+    try {
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(user.password, salt);
+        next();
+    } catch (error) {
+        console.log(error);
+        throw new Error("Error al codificar la contraseña");
     }
 });
 
-export const User = model('user', userSchema);
+export const User = mongoose.model("User", userSchema);
 
 
