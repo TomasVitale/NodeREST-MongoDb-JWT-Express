@@ -1,7 +1,9 @@
 import express from "express";
-import {login, register, victorieta} from "../controllers/auth.controller.js";
+import {login, register, userInfo, refreshToken, logOut} from "../controllers/auth.controller.js";
 import { validationResultExpress } from "../middlewares/validationResultExpress.js";
 import { body } from "express-validator";
+import { requiredToken } from "../middlewares/requiredToken.js";
+import { generateRefreshToken } from "../utils/tokenManager.js";
 
 const router = express.Router();
 
@@ -33,6 +35,15 @@ router.post("/login",
 validationResultExpress,
 login
 );
+
+//Ruta protegida de ejemplo.
+router.get("/userInfo", requiredToken, userInfo);
+
+//Ruta con el refreshToken
+router.get("/refreshToken", refreshToken);
+
+// Cierre de sesion.
+router.get("/logOut", logOut);
 
 
 export default router;
