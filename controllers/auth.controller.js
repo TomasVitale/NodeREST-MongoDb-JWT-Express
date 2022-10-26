@@ -22,6 +22,8 @@ export const login = async (req,res)=>{
         // genera refresh token en una cookie.
         generateRefreshToken(user.id, res);
 
+
+        
         return res.json({token, expiresIn});
 
     } catch (error) {
@@ -67,18 +69,14 @@ export const userInfo =  async (req,res) => {
 export const refreshToken = (req,res) => {
   
     try {
-        const refreshTokenCookie = req.cookies.refreshToken;
-        if(!token) throw new Error("No Existe el token");
 
-        const {uid} = jwt.verify(refreshTokenCookie, process.env.JWT_REFRESH);
-
-        const {token, expiresIn} = generateToken(uid);
+         const {token, expiresIn} = generateToken(req.uid);
         return res.json({token, expiresIn});
         
     } 
     catch (error) {
         console.log(error)
-        return res.status(401);
+        return res.status(500);
     }
 }
 
